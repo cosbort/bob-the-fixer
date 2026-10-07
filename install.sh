@@ -105,6 +105,7 @@ source "$SCRIPT_DIR/lib/dependency-checker.sh"
 source "$SCRIPT_DIR/lib/port-checker.sh"
 source "$SCRIPT_DIR/lib/ai-cli-installer.sh"
 source "$SCRIPT_DIR/lib/copilot-mcp-config.sh"
+source "$SCRIPT_DIR/lib/wsl2-podman-fix.sh"
 source "$SCRIPT_DIR/lib/rollback.sh"
 
 # Global variables
@@ -242,6 +243,15 @@ setup_infrastructure() {
                     print_error "Podman machine must be running"
                     return 1
                 fi
+            fi
+        fi
+
+        # On WSL2 netavark needs the iptables firewall driver (no nftables support)
+        if is_wsl2; then
+            if ! apply_wsl2_podman_fix; then
+                print_warning "Continuing without the WSL2 Podman fix"
+                echo "If containers fail to start, re-run ./install.sh and accept the fix"
+                echo ""
             fi
         fi
     elif command -v docker &> /dev/null; then

@@ -137,6 +137,12 @@ is_wsl() {
     [ -f /proc/version ] && grep -qi microsoft /proc/version
 }
 
+# Check if running in WSL2 (WSL1 has no real Linux kernel, so no containers)
+is_wsl2() {
+    is_wsl || return 1
+    uname -r | grep -qiE "wsl2|microsoft-standard"
+}
+
 # Get total system memory in GB
 get_total_memory() {
     if [ "$OS_TYPE" = "macos" ]; then
